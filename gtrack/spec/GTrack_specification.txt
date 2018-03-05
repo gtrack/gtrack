@@ -1,0 +1,1655 @@
+|-----------------------------------------|
+| Specification of the GTrack file format |
+|-----------------------------------------|
+
+GTrack version: 1.0
+Document version: 1.0.5
+Date: 07 Apr 2012
+Authors: Sveinung Gundersen, Matus Kalas, Osman Abul, Arnoldo Frigessi,
+         Eivind Hovig, Geir Kjetil Sandve
+
+
+----------------
+    Contents
+----------------
+
+* Reading the specification
+* What is GTrack?
+* Example GTrack files
+* Basic specification
+    i.  Comments
+    1.  Header lines
+    2.  Column specification line
+    3a. Bounding region specification line
+    3b. Data lines
+    -   BED compatibility
+    -   Compression
+    -   Detailed specification of character usage
+* Extended specification
+    -   Redefining column names
+    -   WIG compatibility
+    -   FASTA compatibility
+    -   Defining GTrack subtypes
+* References
+* Change log
+
+
+---------------------------------
+    Reading the specification
+---------------------------------
+
+This document contains the complete specification of the GTrack format. As the
+document contains many details, we here present some reading recommendations:
+
+- Skip the "Developer notes" sections if you are not planning to develop parsers
+  of the GTrack format.
+
+- The "Restrictions" section after each main type of GTrack lines contains
+  detailed descriptions that can be skipped by most readers.
+
+- The section "Detailed specification of character usage" contains very detailed
+  information and can be skipped by most readers.
+
+- The sections under "Extended specification" describes extensions that do not
+  add any new types of information to a GTrack file, only alternative ways of
+  expressing the same information, in addition to functionality for defining
+  GTrack subtypes. These sections are thus not required for basic use.
+
+A HTML version of this specification is available at [3]. In the HTML version,
+the sections described above are hidden by default.
+
+
+-----------------------
+    What is GTrack?
+-----------------------
+
+GTrack is short for both "Genomic Track" and "Generic Track". GTrack is a
+general purpose, tabular file format for representing data in the form of
+genomic tracks, that is, as elements associated to positions along a reference
+(genome) sequence, or a set of sequences.
+
+GTrack emphasizes preciseness, flexibility, and simple parsing. This is achieved
+by allowing flexible column specification and declaring syntactic properties at
+the beginning of the file (allowing parsers to cleanly restrict support to a
+subset of the GTrack specification).
+
+A main contribution by the format is the unified and optimized formalization of
+sequence level genomic data into one of fifteen track types, as developed in
+[1]:
+
+Points (P)
+Valued Points (VP)
+Segments (S)
+Valued Segments (VS)
+Genome Partition (GP)
+Step Function (SF)
+Function (F)
+Linked Points (LP)
+Linked Valued Points (LVP)
+Linked Segments (LS)
+Linked Valued Segments (LVS)
+Linked Genome Partition (LGP)
+Linked Step Function (LSF)
+Linked Function (LF)
+Linked Base Pairs (LBP)
+
+These fifteen track types encompass most of the existing file formats, while
+providing support for, among other things, genomic data of a three-dimensional
+nature. The primary goals of the GTrack format are to support all track types
+systematically, simplify parsing and manipulation, allow custom extensions, and
+provide efficient storage.
+
+
+----------------------------
+    Example GTrack files
+----------------------------
+
+Before delving into the details, it is recommended that you examine these
+examples of simple GTrack files. You may return to them while reading the rest
+of the specification, if needed. The first example is the simplest version of
+GTrack, without any specification lines. It shows a data set of a couple of
+genomic segments, and the track type is simply Segments (S).
+
+
+#
+# GTrack example file 1
+#
+# A GTrack file without headers is handled as three-column BED [2]
+#
+chr1  121  201
+chr2  486 1240
+
+
+The second example contains all GTrack specification lines (header line, column
+specification line and bounding region specification line) and shows a dataset
+of genomic segments with additional associated information in extra columns. One
+of these is selected as the main "value" of the segments, which are then of type
+Valued Segments (VS). The example also shows how to add custom columns.
+
+
+#
+# GTrack example file 2
+#
+# Note: tech is a custom column and not part of the GTrack specification
+#
+##Track type: valued segments
+###seqid  tech       start  end   value  strand
+####genome=hg19
+chr1      ChIP-seq   1047   1165  0.625  -
+chr2      ChIP-chip  2002   2450  .      +
+chr2      ChIP-chip  3033   3246  0.355  +
+
+
+The third example is more advanced, showing a Step Function dataset, that is, a
+dataset where every base pair in the domain has an associated value, but where
+this value is constant, or approximated, over larger regions (250-500 bps). The
+domain is, in this case, composed of two bounding regions. In addition, some of
+the regions are linked by edges to other regions in the genome. This example
+file is thus of type Linked Step Function (LSF).
+
+
+#
+# GTrack example file 3
+#
+##Track type: linked step function
+##Edge weights: true
+##Undirected edges: true
+###id  end   value  edges
+
+####seqid=chr1; start=1000; end=2250
+1      1250  10     4=0.4
+2      1500  7      .
+3      2000  2      .
+4      2250  6      1=0.4;6=0.3
+
+####seqid=chr1; start=3000; end=4000
+5      3250  7      .
+6      3500  4      4=0.3
+7      4000  6      .
+
+
+(Note that, for readability issues, spaces are used instead of tab characters in
+these example files. They will therefore not work "out of the box". All example
+files are available as working GTrack files from [3].)
+
+
+---------------------------
+    Basic specification
+---------------------------
+
+GTrack is a tabular text file format. All GTrack filenames should end with
+".gtrack". The GTrack format consists of 5 different line types, distinguished
+by the leading characters and numbered here by order of appearance in the file:
+
+  i. Comments
+  1. Header lines
+  2. Column specification line
+  3a. Bounding region specification line
+  3b. Data lines
+
+Note: The number preceding each line type defines the order in which the lines
+must be present, i.e. column specification must follow the header lines, but
+comments may be present anywhere. Note that a bounding region specification line
+must be followed by a data line, but that a file may have multiple bounding
+region specifications with data lines in between.
+
+A GTrack validator is available at [3].
+
+  -----------
+  i. Comments
+  -----------
+
+  - Leading characters: #
+  - Example
+
+      #This is a comment!
+
+  - Usage: Optional
+
+  Comments are ignored by parsers and may be present anywhere in the file.
+
+
+  ---------------
+  1. Header lines
+  ---------------
+
+  - Leading characters: ##
+
+  - Format
+
+      ##VARIABLE:[ ]*VALUE
+
+      where
+        VARIABLE = Header variable name
+        [ ]* = Optional space characters
+        VALUE = Header variable value
+
+  - Example
+
+      ##gtrack version: 1.0
+      ##track type: valued points
+      ##value type: category
+      ##1-indexed:  False
+      ##end inclusive:True
+
+  - Usage
+
+      Optional, but any header variables not declared regain their default
+      values.
+
+  - Restrictions
+
+      * GTrack files may add custom header variables, e.g. as part of the
+        definition of a GTrack subtype (see section "Defining GTrack subtypes").
+        For reserved header variables, however, the values are restricted to the
+        ones allowed by the header variable (see below).
+
+      * All variable names and reserved variable values are treated as case
+        insensitive and do not support character escaping. Custom values, i.e.
+        header values of non-reserved header variables, do, however, support
+        escaping. For more details, see the section "Detailed specification of
+        character usage".
+
+
+  Header lines provide structural information readable by both humans and
+  automatic parsers. The GTrack format defines a reserved set of header
+  variables, each with a default value. If a header variable is not declared in
+  the header lines, the default value is used. We encourage the use of header
+  lines even when they contain default values as this adds to the clarity of the
+  file and helps reduce parsing errors. The order of the header lines is
+  unimportant.
+
+  Developer notes
+  ---------------
+  As not all parsers/tools will have the need to support the full GTrack
+  specification, developers are welcome to support only subsets. We do, however
+  encourage all GTrack parsers to always check the GTrack header lines and give
+  feedback to the user if a particular feature is unsupported by the
+  parser/tool. Note that non-reserved header lines should be ignored by parsers,
+  unless they specifically support the particular extensions. We encourage
+  parsers to print warning outputs for any unsupported, non-reserved header
+  lines, as they may be a result of typing errors.
+
+  Note also that, for consistency, the default values will not change in future
+  versions of the GTrack specification.
+  ---------------
+
+
+  Reserved header variables
+  -------------------------
+
+  - GTrack version
+
+      The version of the GTrack specification used for the file.
+
+      Default value: 1.0
+
+  - Track type*
+      one of:
+        points
+        valued points
+        segments
+        valued segments
+        genome partition
+        step function
+        function
+        linked points
+        linked valued points
+        linked segments
+        linked valued segments
+        linked genome partition
+        linked step function
+        linked function
+        linked base pairs
+
+      Defines the track type of a GTrack file. Each track type defines a set of
+      core columns to be used. See the section "Column specification line" for
+      more details.
+
+      Default value: segments
+
+  - Value type
+
+      one of:
+        number
+        binary
+        character
+        category
+
+      Only used if the "value" column is defined. Defines the kind of content
+      accepted in the value column. See the section "Column specification line"
+      for more details.
+
+      Default value: number
+
+  - Value dimension
+
+      one of:
+        scalar
+        pair
+        vector
+        list
+
+      Only used if the "value" column is defined. Defines the dimension of the
+      content accepted in the value column. See the section "Column
+      specification line" for more details.
+
+      Default value: scalar
+
+  - Undirected edges*
+
+      Only used if the "edges" column is defined. True if all edges specified in
+      the GTrack file are undirected, else false. Note that undirected edges
+      between two track elements must still be specified in both data lines,
+      using the same weights.
+
+      Default: false
+
+  - Edge weights*
+
+      Only used if the "edges" column is defined. True if weights are specified
+      for edges, else false. If true, all edges must have a weight
+      specification, if false, no edges must specify weight.
+
+      Default value: false
+
+  - Edge weight type
+
+      one of:
+        number
+        binary
+        character
+        category
+
+      Only used if the "edges" column is defined and the "Edge weights" header
+      variable is set to true. Defines the kind of content accepted as edge
+      weights. See the section "Column specification line" for more details.
+
+      Default value: number
+
+  - Edge weight dimension
+
+      one of:
+        scalar
+        pair
+        vector
+        list
+
+      Only used if the "edges" column is defined and the "Edge weights" header
+      variable is set to true. Defines the dimension of the content accepted as
+      edge weights. See the section "Column specification line" for more
+      details.
+
+      Default value: scalar
+
+  - Uninterrupted data lines*
+
+      True if it is guaranteed that the data lines are not interrupted by
+      bounding region specification lines (i.e. that more than one bounding
+      region is specified), comments or blank lines, else false. This is used to
+      help simple parsers.
+
+      Default value: false
+
+  - Sorted elements*
+
+      True if it is guaranteed that all bounding regions and track elements come
+      in sorted order. Bounding regions must be sorted first, and the track
+      elements in each bounding region block second. Regions are sorted by the
+      following fields, in ascending order (using only the ones that are
+      defined): genome, seqid, start, end.
+
+      Default: false
+
+  - No overlapping elements*
+
+      Only used for tracks of type Points and Segments, and the variations of
+      these, i.e. Linked and/or Valued Points (VP/LP/LVP) and Linked and/or
+      Valued Segments (VS/LS/LVS). True if it is guaranteed that no two track
+      elements overlap, else false.
+
+      Default: false
+
+  - Circular elements*
+
+      True if any track element or bounding region cross the coordinate borders
+      of a circular sequence, i.e. that the "end" value is smaller than the
+      "start" value.
+
+      Default: false
+
+  - 1-indexed
+
+      True if the coordinates start at 1, false if the coordinates start at 0.
+
+      Default value: false
+
+  - End inclusive
+
+      True if the end coordinates should be included in intervals, else false.
+      For example, if "End inclusive" is true, the position 10 is included in
+      the interval [0,10], if false, the interval ends with 9.
+
+      Default value: false
+
+      Developer notes
+      ---------------
+      We recommend that all parsers always check the values of the header
+      variables "1-indexed" and "End inclusive", even if only one or some
+      settings are supported by the parser. If the values defined in a GTrack
+      file are unsupported, the parser should fail. This greatly reduces the
+      risk of erroneous positional information.
+      ---------------
+
+  (Note that the section "Extended specification" includes more reserved header
+  variables.)
+
+  *   Some header lines include redundant information compared to the rest of
+      the file. These are marked with * in the listing above. The redundant
+      header lines are still explicitly defined for several reasons. First, in
+      order for a human reader to easily find out which features are used in a
+      file. Second, as a way for simple parsers that only use a subset of the
+      specification to check whether they can parse a particular file. Third, it
+      enables automatic validation of whether a file contains the information in
+      the way the author intended. These header lines can be automatically
+      extracted from the rest of a GTrack file by the "Expand GTrack headers"
+      tool, available at [3].
+
+
+  ----------------------------
+  2. Column specification line
+  ----------------------------
+
+  - Leading characters: ###
+
+  - Format
+
+      ###COL1  COL2  COL3...
+
+      where
+        COL1, COL2, COL3 = Column names
+        "  " = tab character
+
+  - Example
+
+      ###genome  seqid  start  end  strand  geneId  score  id  edges
+      (with tabs instead of spaces)
+
+  - Default value
+
+      ###seqid  start  end
+      (with tabs instead of spaces)
+
+  - Usage
+
+      Optional, but if not defined, retains the default value.
+
+  - Restrictions
+
+      * Column names are treated as case insensitive and do not support
+        character escaping. For more details, see the section "Detailed
+        specification of character usage".
+
+      * All column names must be unique.
+
+
+  The column specification line is a tab-separated list of column names.
+
+  The GTrack specification defines a set of eight reserved column names. Four of
+  these are associated with the four core informational properties: gaps,
+  lengths, values and interconnections. The specific set of core columns present
+  defines the track type (see [1] for more details). The GTrack format also
+  defines 4 reserved columns that, although they do not define track type, have
+  reserved meanings. The associations between the reserved columns and track
+  types are shown in the following table:
+
+
+                    Column name:  genome seqid start end value strand id edges
+                 Type of column:     N     N     C    C    C      N    N   C
+ Track type:
+  Points                   (P)       ?     !     X    .    .      ?    ?   .
+  Segments                 (S)       ?     !     X    X    .      ?    ?   .
+  Genome Partition         (GP)      ?     !     .    X    .      ?    ?   .
+
+  Valued Points            (VP)      ?     !     X    .    X      ?    ?   .
+  Valued Segments          (VS)      ?     !     X    X    X      ?    ?   .
+  Step Function            (SF)      ?     !     .    X    X      ?    ?   .
+  Function                 (F)       ?     !     .    .    X      ?    ?   .
+
+  Linked Points            (LP)      ?     !     X    .    .      ?    X   X
+  Linked Segments          (LS)      ?     !     X    X    .      ?    X   X
+  Linked Genome Partition  (LGP)     ?     !     .    X    .      ?    X   X
+
+  Linked Valued Points     (LVP)     ?     !     X    .    X      ?    X   X
+  Linked Valued Segments   (LVS)     ?     !     X    X    X      ?    X   X
+  Linked Step Function     (LSF)     ?     !     .    X    X      ?    X   X
+  Linked Function          (LF)      ?     !     .    .    X      ?    X   X
+
+  Linked Base Pairs        (LBP)     ?     !     .    .    .      ?    X   X
+
+  C - Core reserved column (defines track type)
+  N - Non-core reserved column (reserved, but does not define track type)
+  X - Column is mandatory
+  ? - Column is optional
+  . - Column is not allowed
+  ! - Property must be present, either as a column or in a bounding region
+      specification (see below)
+
+  Table 1: Overview of the eight reserved columns in the GTrack format and their
+           associations to track type.
+
+
+  Reserved columns
+  ----------------
+
+  - genome
+
+      The genome assembly of the track element (e.g. hg19, mm9). The GTrack
+      format has no explicit requirements on the syntax or semantics of the
+      genome specification; the interpretation is up to the particular
+      parsers/tools. Elements from different genomes are allowed in the same
+      GTrack file.
+
+      Specifying the genome of a track element is optional. The genome may be
+      specified either as a separate column in the data lines, or in a preceding
+      bounding region specification line (see below), or both. If genome is
+      specified both in a bounding region specification and as a column, the
+      values must be equal.
+
+  - seqid
+
+      A sequence identifier, i.e. an identifier of the underlying sequence of
+      the particular track element. Usually defined as chromosome (e.g. chr3,
+      chrY, chr2_random) or scaffold (e.g. scaffold10671), as defined in the
+      genome assembly. As with the "genome" column, the GTrack format has no
+      explicit requirements on the syntax or semantics of the "seqid" column;
+      the interpretation is up to the particular parsers/tools. Some parsers may
+      for instance allow chromosome arms (e.g. chr1p) as seqid.
+
+      All track elements in a GTrack file must have a seqid, either as a
+      separate column in the data lines, or in a preceding bounding region
+      specification line (see below), or both. If seqid is specified both in a
+      bounding region specification and as a column, the values must be equal.
+
+  - start
+
+      The start position of the track element, using the indexing system defined
+      in the header (0- or 1-based).
+
+      Developer notes
+      ---------------
+      The start column is not defined for some track types (as described in
+      Table 1). In order to still work on the start position of an element, it
+      has to be inferred from other information in the following manner,
+      according to track type:
+
+      Genome Partition (GP), Step Function (SF), Linked Genome Partition (LGP)
+      and Linked Step Function (LSF):
+
+        The start position of each track element can be seen as the position
+        immediately following the end of the track element of the previous line.
+        The exact value of the start position depends on the "End inclusive"
+        header variable, i.e. if the coordinates are end-exclusive, the start
+        position of one track element should be exactly the same as the end
+        position of the previous line, if not, the start position should be set
+        to the previous end position + 1. For the first line in a set of data
+        lines, the start position should be set to the start position of the
+        preceding bounding region (see section "Bounding region specification
+        line").
+
+      Function (F), Linked Function (LF) and Linked Base Pairs (LBP):
+
+        Each line defines a successive location along the genome. The start of
+        the first line in a set of data lines is then the start position of the
+        preceding bounding region. The start value is then increased by 1 for
+        each line.
+      ---------------
+
+  - end
+
+      The end position of the track element, using the indexing system (0- or
+      1-based) and "End inclusive" property as defined in the header.
+
+      Developer notes
+      ---------------
+      The end column is not defined for some track types (Points (P), Valued
+      Points (VP), Function (F), Linked Points (LP), Linked Valued Points (LVP),
+      Linked Function (LF) and Linked Base Pairs (LBP), as described in Table
+      1). In order to still work on the end position of an element, it has to be
+      inferred from the start position. In these cases, the end position depends
+      on the "End inclusive" header variable. If true, the end position is the
+      same as the start position, if false, the end position is the start
+      position + 1.
+      ---------------
+
+  - strand
+
+      The strand of the track element. "+" for positive, "-" for negative
+      strand, and "." when strand information is missing or irrelevant.
+
+  - value
+
+      The value or score of the track element. The character "." denotes that
+      the track element has a missing value. The basic type of the contents
+      follow the "Value type" header variable as follows:
+
+        number
+
+          One floating point number, e.g. -1.23, 12 or 3.1e-4. English decimal
+          notation is used, including scientific e notation, with the period
+          character representing the decimal separator, but with no spacing.
+          Note that integer numbers are a subset of floating point numbers, and
+          should use "number" as the value type.
+
+        binary
+
+          One binary value. If this value is used to denote case and control,
+          the following notation must be used: 1 for case, 0 for control.
+
+        character
+
+          One ASCII character, e.g. A, T, C. See the section "Detailed
+          specification of character usage" for restrictions.
+
+        category
+
+          A string defining a category. The set of all category values over all
+          track elements form a category set, e.g: {gene, exon, promoter}. See
+          the section "Detailed specification of character usage" for
+          restrictions.
+
+      In addition, the "Value dimension" header variable may define that the
+      value contains more than one instance of the basic value type, as follows:
+
+        list
+
+          A list of values, following the basic type defined in the "Value type"
+          header variable. Lists of numbers and categories are delimited by
+          comma, e.g. 1.23,2.34,3.45,4,5 or exon,gene,CDS,gene. Lists of binary
+          values and characters use no delimiter, e.g. 1011011010 or ATGCTCGACG.
+          Lists that combine different basic types are not allowed. The length
+          of lists may vary between track elements.
+
+          The missing element character, ".", is allowed as list values, and a
+          single missing element character denotes a zero-length list.
+
+        vector
+
+          A vector of values, similarly defined as a list, with the only
+          difference that vectors must have the same length throughout the
+          GTrack file.
+
+          The missing element character, ".", is allowed as vector values, but a
+          single missing element character for the entire vector is not allowed.
+          A vector with 3 missing numbers should thus be denoted ".,.,.".
+
+        pair
+
+          A pair of values, similarly defined as a vector, with the only
+          limitation that the length is exactly 2.
+
+        scalar
+
+          A single value, following the basic type defined in the "Value type"
+          header variable, e.g. 1.23, 0, g or exon, respectively.
+
+      Developer notes
+      ---------------
+      Note that the different dimensions are defined in a hierarchical manner:
+      lists > vectors > pairs & scalars. All scalars or pairs are also vectors
+      of length 1 or 2, respectively, and all vectors are lists. Support for
+      lists in a parser should then also lead to the support of its
+      "sub-dimensions", given, of course, that the analysis allows that they are
+      treated in an equal fashion.
+      ---------------
+
+  - id
+
+      An unique string identifying each track element (data line). Can be in any
+      format, e.g. 1, aab or uc002ico.1. See the section "Detailed specification
+      of character usage" for restrictions.
+
+  - edges
+
+      A semicolon-separated list of id's, representing edges from the track
+      element in the current line to the track elements which the id's identify.
+      A "." character denotes that the track element has no edges. An edge is by
+      default directed.
+
+      If the header variable "Edge weights" is set to true, each edge must have
+      a weight value directly following, after an equals sign. The format of the
+      weight value follows the "Edge weight type" and the "Edge weight
+      dimension" header variables in the same way as the "value" format follows
+      the "Value type" and "Value dimension" header variables (see above). Note
+      that no space characters are allowed after the semicolon.
+
+      Example:
+
+      ###seqid  start  end  id   edges
+      chr1      0      100  aaa  aab=1.2;aac=.
+      chr1      200    350  aab  aaa=1.1
+      chr1      450    500  aac  .
+
+      Here, the aaa node is connected to the aab node with two directed edges,
+      with the edge from aaa to aab having higher weight than the one in the
+      other direction. Note that undirected edges must still be specified in
+      both directions, using the same weights. This adds redundancy, but
+      simplifies parsing. If all edges in a GTrack file are undirected, the
+      header variable "Undirected edges" should be set to true.
+
+
+  --------------------------------------
+  3a. Bounding region specification line
+  --------------------------------------
+
+  - Leading characters: ####
+
+  - Format
+
+      Type A) ####genome=VAL1
+
+        or
+
+      Type B) ####[genome=VAL1;[ ]*]seqid=VAL2[;[ ]*start=VAL3][;[ ]*end=VAL4]
+
+      where
+        [x] = "x" is optional
+        [ ]* means optional space characters
+        genome, seqid, start, end = reserved attribute names
+        VAL1, VAL2, VAL3, VAL4 = attribute values
+
+  - Example
+
+      ####genome=hg18; seqid=chr1;start=100;  end=10000
+
+  - Usage
+
+      Type B is mandatory for GTrack files of one of the following track types:
+        Genome Partition (GP)
+        Step Function (SF)
+        Function (F)
+        Linked Genome Partition (LGP)
+        Linked Step Function (LSF)
+        Linked Function (LF)
+        Linked Base Pairs (LBP)
+
+      For all other track types, bounding region specification lines are
+      optional.
+
+  - Restrictions
+
+      * Attribute names are treated as case insensitive and do not support
+        character escaping. Genome and seqid values do, however, support
+        escaping. For more details, see the section "Detailed specification of
+        character usage".
+
+      * A bounding region specification remains in effect for a set of data
+        lines until the next bounding region specification.
+
+      * If a GTrack file contains any bounding regions, then all elements must
+        be enclosed by one.
+
+      * Bounding regions are not allowed to overlap.
+
+      * Bounding regions of type A and B are not allowed in the same GTrack
+        file.
+
+      * No data lines following a bounding region of type B may have start or
+        end positions defined outside the bounding region
+
+      * For track types Genome Partition (GP), Step Function (SF), Linked Genome
+        Partition (LGP) and Linked Step Function (LSF), the "end" attribute must
+        be equal to the end position of the last track element of the block of
+        data lines immediately following the bounding region specification line.
+
+        Example:
+
+        ##track type: genome partition
+        ###end
+        ####seqid=chr1; start=100; end=200
+        125
+        133
+        200
+
+      * For track types Function (F), Linked Function (LF) and Linked Base Pairs
+        (LBP), the "end" attribute must be exactly equal to the "start"
+        attribute plus the number of data lines immediately following the
+        bounding region specification line. If the header line "End inclusive"
+        is true, the end position should be 1 less.
+
+        Example:
+
+        ##track type: function
+        ###value
+        ####seqid=chr1; start=100; end=103
+        1.2
+        -0.1
+        0.8
+
+
+  A bounding region specifies a genomic interval encompassing the data lines
+  that follow. A bounding region should be thought of as constituting the domain
+  of the following track elements, i.e. the region where we have information
+  about the properties modeled by the track elements. The set of all bounding
+  regions of a track then constitutes the domain of the track.
+
+  Note that, in the case of Points and Segments (and the variations of these,
+  i.e. Linked and/or Valued Points (VP/LP/LVP) and Linked and/or Valued Segments
+  (VS/LS/LVS), see Table 1), lack of elements is also considered information. A
+  bounding region is then, in this case, a region where we know that the lack of
+  data means something. Areas of the genome that has not been investigated (such
+  as centromeres) should be left outside the bounding regions. For track types
+  other than Points and Segments (and their variations), the track elements do
+  by definition fill the entire domain. For example, a Function has, by
+  definition, a value for all base pairs in the domain. A bounding region is
+  then just the smallest region encompassing the track elements that follow. For
+  more details, see [1].
+
+  The bounding region specification comes in two flavors:
+
+  A)
+      The bounding region specifies the genome assembly for the following track
+      elements, using the same format as for the "genome" column (see the
+      "Column specification line" section). The domain of the track is then the
+      set of sequences constituting the genome, e.g. all chromosomes of the
+      genome. If a track contains several genomes, the domain of the track is
+      the collected set of sequences constituting all the specified genomes.
+
+  B)
+      The bounding region specifies a single sequence, or part of this sequence,
+      as the domain of the following track elements. The format is a set of
+      attribute pairs separated by semicolon and optional space characters. For
+      each attribute pair, the attribute name and the value are separated by the
+      equals sign. The attributes may appear in any order. The allowed
+      attributes are the following:
+
+      - genome
+
+          The genome assembly of the bounding region(e.g. hg19, mm9). The format
+          of the genome attribute is the same as for the "genome" column (see
+          the section "Column specification line"). The "genome" attribute is
+          optional.
+
+      - seqid
+
+          A sequence id, e.g. the id of the underlying sequence of the bounding
+          region. The format of the seqid attribute is the same as for the
+          "seqid" column (see the section "Column specification line"). The
+          "seqid" attribute is mandatory for a bounding region specification
+          line of type B.
+
+          Note that if type B bounding region specifications are not defined,
+          the "seqid" column must be included in the column specification line.
+
+      - start
+
+          The start position of the bounding region, using the indexing system
+          defined in the header (0- or 1-based). The "start" attribute is
+          optional.
+
+          Developer notes
+          ---------------
+          If the "start" attribute is not specified, the start position of the
+          bounding region is 0 (or 1, if the header variable "1-indexed" is
+          true).
+          ---------------
+
+      - end
+
+          The end position of the bounding region, using the indexing system (0-
+          or 1-based) and "End inclusive" property as defined in the header. The
+          "end" attribute is optional.
+
+          Developer notes
+          ---------------
+          If the "end" attribute is not specified, the end position of the
+          bounding region is the same as the end position of the sequence
+          referenced by the "seqid" attribute, e.g. the length of the current
+          chromosome. If the parser does not have information about the length
+          of the sequence in question, the user should be informed, or, in the
+          case that the bounding region is unimportant for the parser, the
+          bounding region specification should be ignored.
+
+          Note that the restrictions regarding the "end" attribute for certain
+          track types (see section "Restrictions" above) must still hold, even
+          if the "end" attribute is not explicitly specified.
+          ---------------
+
+
+  --------------
+  3b. Data lines
+  --------------
+
+  - Leading characters:
+
+  - Format
+
+      VAL1  VAL2  VAL3...
+
+      where
+        VAL1, VAL2, VAL3 = column values
+        "  " = tab character
+
+  - Example
+
+      chr21  304  997  -  FOOGENE  423  1  .
+      (with tabs instead of spaces)
+
+  - Usage
+
+      Data lines are optional.
+
+  - Restrictions
+
+      * Column values support character escaping, as specified in the section
+        "Detailed specification of character usage".
+
+      * The number of columns of each data line must be equal to the number of
+        columns in the column definition line.
+
+      * For track types Genome Partition (GP), Step Function (SF), Linked Genome
+        Partition (LGP), and Linked Step Function (LSF), the data lines in each
+        bounding region block must be sorted on the "end" value, in ascending
+        order.
+
+
+  Each data line is a tab-separated list of values, as defined by the column
+  definition line. If there is a missing value in either of the "value" and
+  "edges" columns, the period character, ".", may be used. See the section
+  "Column specification line" for more details.
+
+
+  -----------------
+  BED compatibility
+  -----------------
+
+  Note that a simple BED file only using the three columns chr, start and end is
+  directly compatible with the GTrack format. This is because the default track
+  type of a GTrack file is Segments (S), which defines the same three core
+  columns as a simple BED file (see Table 1). One may thus only rename the file
+  ending of such a file from ".bed" to ".gtrack" and run it through a GTrack
+  parser. If a UCSC custom track definition line or other headers are present,
+  they must be commented out. More complex BED files must be converted.
+  Converters to common file formats are available at [3].
+
+
+  -----------
+  Compression
+  -----------
+
+  As genomic tracks may contain large amounts of data, we require that fully
+  compliant GTrack parsers support the expansion of tabular files compressed
+  with the gzip compression algorithm [4]. Such GTrack files should have the
+  suffix ".gtrack.gz".
+
+
+  -----------------------------------------
+  Detailed specification of character usage
+  -----------------------------------------
+
+  - The GTrack format supports escaping of special characters using URL escaping
+    conventions (%XX hex codes). All ASCII characters are supported, except the
+    following, which must be escaped everywhere:
+
+      Most control characters (except TAB, LF, CR): %00-%08, %0B-%0C,
+                                                    %0E-%1F, %7F
+      Extended ASCII characters: %80 through %FF
+
+    Also, the following characters have reserved meaning, and must be escaped
+    when used with other meanings in places where they may interfere with the
+    parsing:
+
+      tab (TAB): %09
+      newline (LF): %0A
+      carriage return (CR): %0D
+      space: %20
+      # (hash): %23
+      % (percent): %25
+      , (comma): %2C
+      ; (semicolon): %3B
+      = (equals): %3D
+      . (period): %2E
+
+    Note that spaces needs not be escaped in data lines, as the data values are
+    separated by tabs.
+
+  - Reserved phrases in a GTrack file receive special treatment. Reserved
+    phrases include all header variable names, reserved header variable values
+    (excluding custom header variable values), column names (including custom
+    columns) and bounding region attribute names. Reserved phrases should be
+    treated as case insensitive and do not support URL escaping.
+
+  - One should in all cases avoid starting or ending a value with unescaped
+    whitespace.
+
+  - A line must end with the newline character (LF), optionally preceded by a
+    carriage return (CR).
+
+  - Blank lines should be ignored by parsers.
+
+  - Comments, header lines, column specification lines and bounding region
+    specification lines are characterized by the leading number of #-characters.
+    Note that, except for comments, once the file reaches a certain "level" of
+    #-characters, this count never goes down. Thus, header lines, column
+    specification and bounding region specifications are always found in that
+    order.
+
+  - Note that delimiter characters differ for the various lines/columns. See the
+    specification above for details. Also note that examples in this file use
+    spaces instead of tabs for readability. These examples should not be
+    directly copied into GTrack files.
+
+
+------------------------------
+    Extended specification
+------------------------------
+
+  The extended part of the GTrack specification consists of the following header
+  variables:
+
+    - Value column
+    - Edges column
+    - Fixed length
+    - Fixed gap size
+    - Fixed-size data lines
+    - Data line size
+    - GTrack subtype
+    - Subtype version
+    - Subtype URL
+    - Subtype adherence
+
+  These header variables are redundant compared to the basic GTrack
+  specification, that is, they do not allow any extra types of information to be
+  represented. They do, however, allow existing information to be represented in
+  more practical ways, in addition to supporting standardized ways of extending
+  the GTrack format by defining GTrack subtypes.
+
+
+  -----------------------
+  Redefining column names
+  -----------------------
+
+  A GTrack file may contain several columns that could be used as the "value"
+  column, and similarly for the "edges" column. To change which columns are
+  used, one must, as described in the basic GTrack specification, modify the
+  column specification line. The following header variables may, however,
+  simplify the process.
+
+  - Value column
+
+      The name of the column to be used as the "value" column.
+
+      Default: value
+
+  - Edges column
+
+      The name of the column to be used as the "edges" column.
+
+      Default: edges
+
+  Note that if either of these header variables has a non-default value, the
+  corresponding default value ("value" or "edges") must not be included in the
+  column specification line. The following example is thus an incorrect GTrack
+  file:
+
+    ##track type: valued segments
+    ##value column: score
+    ###seqid  start  end  value  score
+    chr1      0      50   1.0    0.9
+    chr1      100    125  1.1    0.8
+
+  The following file does, however, follow the GTrack specification:
+
+    #
+    # GTrack example file 4
+    #
+    ##track type: valued segments
+    ##value column: score2
+    ###seqid  start  end  score1  score2
+    chr1      0      50   1.0     0.9
+    chr1      100    125  1.1     0.8
+
+  Developer notes
+  ---------------
+  The "Value column" and the "Edges column" header variables should be
+  interpreted prior to parsing the column specification line. The column name
+  referred to by the variable(s) should be renamed to "value" or "edges",
+  respectively. If two columns in this way ends up with the same name, the
+  parser should return an error. In this way, a parser that does not support the
+  "Value column" and "Edges column" header variables will issue an error when a
+  properly specified GTrack file with such headers are parsed, as, in that case,
+  the track type will not match the column specification line according to table
+  1. Parsing errors are recommended over incorrect analysis results caused by
+  erroneous interpretation of columns.
+  ---------------
+
+
+  -----------------
+  WIG compatibility
+  -----------------
+
+  The WIG format [6] includes the parameters "step" and "span", specifying a
+  fixed step size, i.e. the distance between start positions, and a fixed span
+  size, i.e. the length of track elements, respectively. Consider for instance
+  the following WIG file:
+
+    fixedStep chrom=chr1 start=201 step=100 span=50
+    25.0
+    26.0
+    fixedStep chrom=chr2 start=151 step=100 span=50
+    10.0
+    11.0
+
+  A GTrack version of this file, using the basic specification, would look
+  something like this, using three columns instead of one:
+
+    #
+    # GTrack example file 5A
+    #
+    ##Track type: valued segments
+    ##1-indexed: true
+    ##End inclusive: true
+    ###start  end  value
+    ####seqid=chr1
+    201  250  25.0
+    301  350  26.0
+    ####seqid=chr1
+    151  200  10.0
+    251  300  11.0
+
+  In order to support WIG-like functionality in GTrack, the following header
+  variables may be used:
+
+  - Fixed length
+
+      Only used when the end column is not specified. Defines a fixed length for
+      all elements in the GTrack file.
+
+      Restrictions:
+
+        * fixed length >= 1
+
+      Track type dependency:
+
+        When fixed length > 1, the track type should be determined as though the
+        end column is present (see Table 1).
+
+      Default: 1
+
+      Developer notes
+      ---------------
+      Contrary to the restrictions of bounding regions of type B (see above),
+      the end position of the segments in a bounding region is allowed to cross
+      the region border, if implicitly defined by the "Fixed length" header
+      variable. Depending on the application, the parser must decide whether to
+      crop the length of the elements, i.e. set the end position of any elements
+      crossing the region border (typically the last element) equal to the end
+      position of the surrounding bounding region.
+      ---------------
+
+  - Fixed gap size
+
+      Only used when neither the start nor the end column is specified. Defines
+      fixed-size gaps between all neighboring elements in the same bounding
+      region. Gap size is defined as the number of uncovered base pairs between
+      the elements. The following equation defines the relation between length,
+      gap size and start positions:
+
+        start_n+1 = start_n + fixed length + fixed gap size
+
+      where
+        "start_n+1" is the start position of a track element immediately
+        following an element with start position "start_n" in the same bounding
+        region.
+
+      Restrictions:
+
+        * fixed length + fixed gap size > 0
+
+        * Only allowed in GTrack files using bounding regions of type B (see
+          section "Bounding region specification line"). The start position of
+          the first element in a bounding region is then equal to the start of
+          the bounding region.
+
+      Track type dependency:
+
+        When fixed gap size != 0, the track type should be determined as though
+        the start column is present (see Table 1).
+
+      Default: 0
+
+  To convert from a WIG file to a GTrack file, one may use the following
+  formulas:
+
+    fixed length = span
+
+    fixed gap size = step - span
+
+
+  The WIG file shown above may then be represented in the following way as a
+  GTrack file:
+
+    #
+    # GTrack example file 5B
+    #
+    ##Track type: valued segments
+    ##1-indexed: true
+    ##End inclusive: true
+    ##Fixed length: 50
+    ##Fixed gap size: 50
+    ###value
+    ####seqid=chr1; start=201
+    25.0
+    26.0
+    ####seqid=chr2; start=151
+    10.0
+    11.0
+
+  Note that the definitions above allow negative values for the variable "Fixed
+  gap size". Such values may be used to represent sliding windows, i.e. segments
+  that overlap with a fixed number of base pairs.
+
+
+  -------------------
+  FASTA compatibility
+  -------------------
+
+  The following header variables may be used to represent FASTA-like sequences
+  [5], and other simple function tracks, such as GC content, in a condensed
+  manner. Consider a GTrack file of type "Function", with only the value column
+  specified:
+
+    #
+    # GTrack example file 6A
+    #
+    ##Track type: function
+    ##Value type: character
+    ###value
+    ####seqid=seq001
+    A
+    G
+    C
+    ####seqid=seq002
+    G
+    G
+
+  This is a valid GTrack file according to the basic specification. However,
+  reading a sequence using only one nucleotide per line is quite impractical.
+  The following header variables changes the interpretation of the data lines:
+
+  - Fixed-size data lines
+
+      True if each data line has an exact size in terms of number of characters.
+      This is only allowed for track type Function (F), and only if the only
+      column specified is "value". Newline and carriage return characters are
+      ignored when parsing, and the data lines are separated using the number of
+      characters specified in the header variable "Data line size" (below).
+
+      Developer notes
+      ---------------
+      Note that parsers still need to be able to recognize bounding region
+      specification lines.
+      ---------------
+
+      Default: false
+
+  - Data line size
+
+      The size of each data line in terms of number of characters. Is only used
+      if the header variable "Fixed-size data lines" (above) is true.
+
+      Default: 1
+
+  Using these header variables, the example GTrack file shown above can be
+  expressed in the following way:
+
+    #
+    # GTrack example file 6B
+    #
+    ##Track type: function
+    ##Value type: character
+    ##Fixed-size data lines: true
+    ##Data line size: 1
+    ###value
+    ####seqid=seq001
+    AGC
+    ####seqid=seq002
+    GG
+
+
+  ------------------------
+  Defining GTrack subtypes
+  ------------------------
+
+  The GTrack format includes support for defining GTrack subtypes, that is, file
+  formats that adhere to only a subset of the GTrack specification. This allows
+  implementation of more specialized parsers, while at the same time ensuring
+  that subtype GTrack files still work with fully compliant GTrack parsers.
+  GTrack subtypes may also be used to standardize special GTrack configurations,
+  removing the need for the individual GTrack files to include all the required
+  meta information. We encourage independent specification of subtypes catering
+  to specialized needs.
+
+  A GTrack subtype defines default values for header variables and/or the column
+  specification line. A subtype may also add new header variables or define how
+  parsers should interpret the values of any non-reserved columns. GTrack
+  subtypes must still conform to the GTrack specification. Interpretation of new
+  columns or header lines do of course require specialized parsers.
+
+
+  Example #1: FASTA
+  -----------------
+
+  As an example of the use of subtypes, we show how GTrack can be used in a
+  similar manner as conventional FASTA files [5] (see the section "FASTA
+  compatibility" above). Example file 7A is the subtype specification file:
+
+
+    #
+    # GTrack example file 7A
+    #
+    # Specification of FASTA subtype for GTrack.
+    # Available at http://gtrack.no/fasta.gtrack
+    #
+    ##GTrack version: 1.0
+    ##GTrack subtype: FASTA
+    ##Subtype version: 1.0
+    ##Subtype adherence: strict
+    ##Track type: function
+    ##Value type: character
+    ##Fixed-size data lines: true
+    ##Data line size: 1
+    ###value
+
+
+  When using the subtype, an "online" parser will download the subtype
+  specification file (over) and use the specified header values and/or column
+  specification line instead of the GTrack default values. The header of a
+  GTrack file adhering to the subtype may then be as simple as including the URL
+  of the subtype specification, as in example file 7B:
+
+
+    #
+    # GTrack example file 7B
+    #
+    # This file makes use of the FASTA subtype specification.
+    #
+    ##Subtype URL: http://gtrack.no/fasta.gtrack
+    ####seqid=seq0001
+    TAGACATTACCGCTAGGATGATGCGATCGATCGATCCCTCTGGATTAGGAGATCTCTAGATCGATGATATCCTCNN
+    NNNNNNNATTGCTCTAGCTCTAGCTCTAGCT
+    ####seqid=seq0002
+    GATTACATATCGCGATCGACTCGCCACTATAACTTCGAGTCTGACGATGATGGGGGGG
+
+
+  GTrack subtype header lines
+  ---------------------------
+
+  Subtype functionality is applied with the following header variables:
+
+  - GTrack subtype
+
+      The name of the subtype of the GTrack format used for the file, if any.
+      May be specified if a GTrack file conforms to a subtype, even if the
+      header variable "Subtype URL" is not specified.
+
+      Developer notes
+      ---------------
+      Custom parsers that only support certain subtypes should check this header
+      and give feedback to users if the subtype is not correct.
+      ---------------
+
+      Default value: ""
+
+  - Subtype version
+
+      The version of the GTrack subtype. May be specified if a GTrack file
+      conforms to a subtype, even if the header variable "Subtype URL" is not
+      specified.
+
+      Default value: 1.0
+
+  - Subtype URL
+
+      URL to a GTrack file used as a specification/model for the GTrack subtype,
+      if any. The subtype GTrack specification file is a normal GTrack file, but
+      without bounding region specification lines or data lines. The header
+      lines and/or the column specification line of a GTrack subtype model file
+      is used instead of the default values for other GTrack files that adhere
+      to the subtype. Any other specifications/restrictions should be included
+      as comments.
+
+      The "Subtype URL" header variable is not allowed in GTrack subtype
+      specification files.
+
+      Developer notes
+      ---------------
+      If a GTrack file contains a Subtype URL header line, the subtype
+      specification file should be downloaded by the parser. Incomplete URLs
+      without a specified scheme (e.g. "gtrack.no") should be treated as
+      HTTP-addresses (e.g. "http://gtrack.no"). Any inconsistencies between
+      header lines of the GTrack files and the subtype headers should be treated
+      according to the "Subtype adherence" header variable (see below). If the
+      header variables "GTrack subtype" or "Subtype version" (see below) in a
+      GTrack file do not correspond to the same header variables in the subtype
+      specification file, the user should be informed. It is then up to the
+      parser to decide whether or not to continue parsing.
+
+      If subtype specification downloading is not supported by the parser and a
+      subtype URL is provided in the GTrack file, the user should be informed
+      that he/she may use the "Expand GTrack headers" tool available at [3] in
+      order to merge the subtype headers with the GTrack file for use in
+      "offline" parsers.
+      ---------------
+
+      Default value: ""
+
+  - Subtype adherence
+
+      Subtype adherence may be specified in the subtype GTrack specification
+      file and will then regulate the way a GTrack file may override the subtype
+      specification. The subtype adherence may also be specified in a GTrack
+      file, and will in this case function as a signal to parsers. In this way,
+      different parsers may allow different levels of adherence for GTrack files
+      of the same subtype.
+
+      The following values are allowed:
+
+        strict
+
+          Values of header variables and the column specification line, as
+          defined by the subtype, may not be overridden by the contents of a
+          file. GTrack defaults may be overridden.
+
+          This option may be used to force users of a subtype to follow the
+          specification exactly.
+
+        extensible
+
+          As strict, but allows redefinition of the column specification line in
+          one aspect:
+
+          * any number of extra columns, including non-core reserved columns,
+            may be added to the end of the column specification line. Adding
+            core reserved columns is not allowed.
+
+          This option may be used to allow users of a subtype to add their own
+          content, while maintaining the exact interpretation of the first
+          columns as defined by the subtype.
+
+        redefinable
+
+          As extensible, but allows redefinition of the column specification
+          line in another aspect:
+
+          * the "value" and "edges" columns may be redefined, i.e. any non-core
+            column names may be renamed to "value" or "edges", and vice-versa,
+            or the "value" and/or "edges" column may be added to the end of the
+            column specification line.
+
+          * correspondingly, the header lines "Track type", "Value type", "Value
+            dimension", "Undirected edges", "Edge weights", "Edge weight type",
+            "Edge weight dimension", "Value column" and "Edges column" may also
+            be redefined by the GTrack file.
+
+          This option may be used to allow users of a subtype to add their own
+          content, including redefining the "value" and "edges" columns, while
+          maintaining exactly the same content in the first columns as defined
+          by the subtype.
+
+        reorderable
+
+          As strict, but allows redefinition of the column specification line in
+          the following manner:
+
+          * all columns specified in the subtype specification must be included,
+            but can be put in any order, and any extra columns may be added.
+
+          * correspondingly, the header line "Track type" may also be redefined
+            by the GTrack file.
+
+          Note that in this case, redefinition of the "value" or "edges" columns
+          is not allowed, as in "redefinable", but a "value" or an "edges"
+          column may be added, if not present. This restriction guarantees
+          consistent indentification of columns by column name.
+
+          This option may be used to allow users of a subtype to adopt their own
+          column ordering, while at the same time maintaining that a minimum of
+          columns must be present, identifiable by column name.
+
+        free
+
+          Everything is allowed, as long as the GTrack specification is
+          followed.
+
+          This option leads to the subtype specification being used for no more
+          than an alternative definition of default values of the GTrack header
+          lines and column specification line.
+
+      Developer notes
+      ---------------
+      Note that if subtype adherence is specified in the subtype specification
+      as anything other than "free", a GTrack file using the subtype
+      specification may not redefine this value.
+      ---------------
+
+      Default value: free
+
+
+  Example #2: Short reads
+  -----------------------
+
+  As an extra example of the subtype functionality, we here propose a format for
+  storing short reads (e.g. from ChIP-seq experiments). Again, example file 8A
+  is the GTrack subtype specification file, and example file 8B is a GTrack file
+  making use of the subtrack:
+
+
+    #
+    # GTrack example file 8A
+    #
+    # Specification of Short reads example subtype.
+    # Available at http://gtrack.no/shortreads_example.gtrack
+    #
+    ##GTrack version: 1.0
+    ##GTrack subtype: Short reads example
+    ##Subtype version: 0.9
+    ##Subtype adherence: redefinable
+    ##Track type: segments
+    ###seqid  start  end  strand  read        quality
+    #
+    # Unmapped reads may be stored in comment lines at the end of the file, as
+    # exemplified below.
+    #
+    # Unmapped reads:
+    #
+    # AGATAGATAGGATCCCAGCTGACT
+    # AGTCCTCTAGCTCTGACTATC
+
+
+  ---
+
+
+    #
+    # GTrack example file 8B
+    #
+    # GTrack file making use of the Short reads example subtype.
+    #
+    ##Track type: valued segments
+    ##Subtype URL: http://gtrack.no/shortreads_example.gtrack
+    ###seqid  start  end  strand  read        value    new
+    chr1      101    111  +       AGTAGATAGC  0.8      0
+    chr1      203    244  -       0:C;15:G    0.7      1
+    #
+    # Unmapped reads:
+    #
+    # ATGAATATTAAAAATCTCCT
+    # AGCGACCATACGTACATTACGAC
+
+
+  The "Short reads example" subtype defines two extra columns, named "read" and
+  "quality". A read is then either the exact read (using nucleotide symbols with
+  the exact same length as the track element) or a semicolon-separated list of
+  colon-separated mismatches, where a mismatch is represented by a relative
+  position and a nucleotide symbol. The reference is here the genome assembly
+  specified in the description lines. The relative positions should follow the
+  indexing defined by the "1-indexed" header variable. The column quality
+  contains the quality score of the read. According to the "redefinable" subtype
+  adherence setting, adding columns to the end are allowed. In example file 7B,
+  the "new" column is added. Also note that the "redefinable" setting allows the
+  redefinition of any column as a "value" column, here the "quality" column.
+
+  A set of basic GTrack subtypes are available from [3].
+
+
+------------------
+    References
+------------------
+
+[1] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+    elemental genomic track types and representing them uniformly. BMC
+    Bioinformatics 2011, 12:494.
+[2] http://genome.ucsc.edu/FAQ/FAQformat.html
+[3] http://www.gtrack.no
+[4] http://www.gzip.org
+[5] http://www.ncbi.nlm.nih.gov/BLAST/blastcgihelp.shtml
+[6] http://genome.ucsc.edu/goldenPath/help/wiggle.html
+
+
+------------------
+    Change log
+------------------
+
+v1.0.6 - 2015.05.16:
+
+    * Starting or ending a value with whitespace is now allowed, but adviced
+      against
+
+v1.0.5 - 2012.07.04:
+
+    * Clarified the start position of the first element in a bounding region
+      when using of "fixed gap size".
+
+v1.0.4 - 2012.03.22:
+
+    * Small clarification of the use of the missing value character in vectors
+      and lists.
+
+v1.0.3 - 2012.01.16:
+
+    * Clarified the use of the missing value character in vectors and lists.
+
+v1.0.2 - 2012.01.09:
+
+    * Fixed typo in the explanation of the "value column" and "edges column"
+      header variables.
+
+v1.0.1 - 2011.12.30:
+
+    * Rephrased the explanation of the "End inclusive" header variable.
+    * Updated citation.
+    * Fixed some quotation marks and capitalization issues.
+
+v1.0 - 2011.12.23:
+
+    * First public version, included as "Additional file 1" in [1].
