@@ -1,0 +1,22 @@
+##subtype url: http://gtrack.no/wig_fixedstep.gtrack
+
+# Note: the old WIG declaration line are commented out
+
+#fixedStep chrom=chr21 start=1 step=1
+##track type: function
+####seqid=chr21; start=1; end=15
+55.055
+64.083
+67.204
+68.787
+69.743
+70.384
+70.843
+71.188
+71.457
+71.672
+71.849
+71.996
+72.120
+72.227
+72.320

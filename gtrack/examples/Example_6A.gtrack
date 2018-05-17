@@ -1,0 +1,13 @@
+#
+# GTrack example file 6A
+#
+##Track type: function
+##Value type: character
+###value
+####seqid=seq001
+A
+G
+C
+####seqid=seq002
+G
+G

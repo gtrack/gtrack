@@ -1,0 +1,42 @@
+#
+# Mean/Standard Deviation GTrack subtype 
+#
+# Contains the specification of the mean/standard deviation value type handled
+# by the Genomic HyperBrowser [1,2]. This type can be used for summarizing
+# population data for each track element.
+#
+# The Genomic HyperBrowser will accept the value column as pairs of mean and
+# standard deviation values for a GTrack file if the header variable "GTrack
+# subtype" is specified as "Mean/sd". This may be done explicitly, or via a
+# "subtype URL" declaration (as the subtype specification file, i.e. this file,
+# includes the "GTrack subtype" header), or both.
+#
+# See [3] for more details on GTrack and the concepts of track types. The GTrack
+# specification and GTrack subtypes and example files are found at [4].
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/mean_sd.gtrack
+#
+#
+# [1] http://hyperbrowser.uio.no
+#
+# [2] Sandve GK, Gundersen S, Rydbeck H, Glad IK, Holden L, Holden M, Liestol K,
+#     Clancy T, Ferkingstad E, Johansen M, Nygaard V, Tostesen E, Frigessi A,
+#     Hovig E: The Genomic HyperBrowser: inferential genomics at the sequence
+#     level. Genome Biol 2010, 11(12):R121.
+#
+# [3] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [4] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: Mean/sd
+##subtype version: 1.0
+##subtype adherence: reorderable
+##value type: number
+##value dimension: pair
+###value

@@ -1,0 +1,31 @@
+#
+# GTrack subtype for GFF data (ad hoc version)
+#
+# Ad hoc GTrack subtype for converting the main example file from the GFF
+# version 3 specification [1] to GTrack. See [2] for more details on GTrack and
+# the concepts of track types. The GTrack specification and GTrack subtypes and
+# example files are found at [3].
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/gff_ad_hoc.gtrack
+#
+#
+# [1] http://www.sequenceontology.org/gff3.shtml
+#
+# [2] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [3] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: GFF ad hoc
+##subtype version: 1.0
+##subtype adherence: redefinable
+##track type: linked valued segments
+##value type: category
+##1-indexed: true
+##end inclusive: true
+###source	value	start	end	score	strand	phase	id	name	edges

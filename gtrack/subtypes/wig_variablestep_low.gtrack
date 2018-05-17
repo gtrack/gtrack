@@ -1,0 +1,33 @@
+#
+# GTrack subtype similar to WIG variableStep [1]. See [2] for more details on
+# GTrack and the concepts of track types. The GTrack specification and GTrack
+# subtypes and example files are found at [3].
+#
+# The 'span' parameter of WIG variableStep is equal to the 'fixed length' header
+# variable in GTrack, which defaults to 1. GTrack files using the 'WIG
+# variableStep' subtype may change this, if needed. If kept at default, the
+# track type must be 'valued points'. If 'fixed length' > 1, the track type is
+# 'valued segments'. Track type must be specified in the GTrack file using the
+# subtype.
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/wig_variablestep.gtrack
+#
+#
+# [1] http://genome.ucsc.edu/goldenPath/help/wiggle.html
+#
+# [2] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [3] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: WIG variableStep
+##subtype version: 1.0
+##subtype adherence: strict
+##value type: number
+##value dimension: scalar
+###start	value

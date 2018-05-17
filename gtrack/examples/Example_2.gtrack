@@ -1,0 +1,11 @@
+#
+# GTrack example file 2
+#
+# Note: tech is a custom column and not part of the GTrack specification
+#
+##Track type: valued segments
+###seqid	tech	start	end	value	strand
+####genome=hg19
+chr1	ChIP-seq	1047	1165	0.625	-
+chr2	ChIP-chip	2002	2450	.	+
+chr2	ChIP-chip	3033	3246	0.355	+

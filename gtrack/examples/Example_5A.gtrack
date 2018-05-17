@@ -1,0 +1,13 @@
+#
+# GTrack example file 5A
+#
+##Track type: valued segments
+##1-indexed: true
+##End inclusive: true
+###start	end	value
+####seqid=chr1
+201	250	25.0
+301	350	26.0
+####seqid=chr2
+151	200	10.0
+251	300	11.0

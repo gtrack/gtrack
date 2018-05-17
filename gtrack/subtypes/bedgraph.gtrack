@@ -1,0 +1,30 @@
+#
+# GTrack subtype for bedGraph data
+#
+# Works directly with bedGraph [1] data. See [2] for more details on GTrack and
+# the concepts of track types. The GTrack specification and GTrack subtypes and
+# example files are found at [3].
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/bedgraph.gtrack
+#
+#
+# [1] http://genome.ucsc.edu/goldenPath/help/bedgraph.html
+#
+# [2] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [3] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: bedGraph
+##subtype version: 1.0
+##subtype adherence: strict
+##track type: valued segments
+##value type: number
+##value dimension: scalar
+##uninterrupted data lines: true
+###seqid	start	end	value

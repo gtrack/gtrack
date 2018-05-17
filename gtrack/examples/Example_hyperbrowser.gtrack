@@ -1,0 +1,27 @@
+#
+# Note: The Genomic HyperBrowser will accept metacontent from a GTrack file if
+#       the header variable "GTrack subtype" is specified as "HyperBrowser".
+#       This may be done explicitly, or via a "subtype URL" declaration (as the
+#       subtype specification file includes the "GTrack subtype" header), or
+#       both.
+#
+##gtrack subtype: hyperbrowser
+##subtype url: http://gtrack.no/hyperbrowser.gtrack
+
+##name: Example 3-column BED file
+##description: An example 3-column BED file made to show the compatibility of the GTrack format, in addition to the metacontent headers added by the hyperbrowser GTrack subtype.
+##display: Very normal
+##methods: Just a regular keyboard
+##credits: Sveinung Gundersen
+##reference: %3Ca%20href%3D%22www.gtrack.no%22%3EGTrack%20web%20site%3C%2Fa%3E
+##restrictions: Do not use this for anything serious
+##version: 0.9beta
+##quality: Nonsense
+##contact: sveinung.gundersen@fake.email.address
+##celltype: B-cell
+
+chr1	123	256
+chr1	324	462
+chr1	678	876
+chr2	355	534
+chr2	674	784

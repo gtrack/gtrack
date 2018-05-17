@@ -1,0 +1,47 @@
+#
+# GTrack subtype similar to WIG fixedStep [1]. See [2] for more details on
+# GTrack and the concepts of track types. The GTrack specification and GTrack
+# subtypes and example files are found at [3].
+#
+# The 'span' parameter of WIG fixedStep is equal to the 'fixed length' header
+# variable in GTrack, which defaults to 1. The 'step' parameter can be
+# represented by the 'fixed gap size' header variable of GTrack, which defaults
+# to 0. The conversion can be done using the following formulas:
+#
+#     fixed length = span
+#
+#     fixed gap size = step - span 
+#
+# GTrack files using the 'WIG fixedStep' subtype may change the 'fixed length'
+# and 'fixed gap size' header variables, if needed. Track type must also be
+# specified in the GTrack file using the subtype. Track type is dependent on the
+# header variables in the following way:
+#
+#                    | fixed gap size=0   fixed gap size!=0
+#     ---------------+-------------------------------------
+#     fixed length=1 | function		        valued points
+#     fixed length>1 | step function	    valued segments
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/wig_fixedstep.gtrack
+#
+#
+# [1] http://genome.ucsc.edu/goldenPath/help/wiggle.html
+#
+# [2] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [3] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: WIG fixedStep
+##subtype version: 1.0
+##subtype adherence: strict
+##value type: number
+##value dimension: scalar
+##1-indexed: true
+##end inclusive: true
+###value

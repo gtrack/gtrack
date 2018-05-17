@@ -1,0 +1,18 @@
+##subtype url: http://gtrack.no/wig_variablestep.gtrack
+
+# Note: the old WIG declaration lines are commented out
+
+#variableStep chrom=chr1
+##track type: valued points
+####seqid=chr1
+201	25.0
+301	26.0
+351	25.0
+476	23.0
+
+#variableStep chrom=chr2
+####seqid=chr2
+151	10.0
+251	11.0
+376	13.0
+501	14.0

@@ -1,0 +1,20 @@
+##subtype URL: http://gtrack.no/gff_ad_hoc.gtrack
+
+# Note: the old GFF headers are commented out
+
+# ##gff-version 3
+# ##sequence-region ctg123 1 1497228
+####seqid=ctg123; start=1; end=1497228
+.	gene	1000	9000	.	+	.	gene00001	EDEN	.
+.	mRNA	1050	7000	.	+	.	mRNA00001	EDEN.1	gene00001
+.	mRNA	1300	7000	.	+	.	mRNA00002	EDEN.2	gene00001
+.	exon	1300	1500	.	+	.	exon00001	.	mRNA00002
+.	exon	3000	3902	.	+	.	exon00002	.	mRNA00001;mRNA00002
+.	exon	5000	7000	.	+	.	exon00003	.	mRNA00001;mRNA00002
+.	CDS	1201	1500	.	+	0	cds00001.1	edenprotein.1	mRNA00001
+.	CDS	3000	3902	.	+	0	cds00001.2	edenprotein.1	mRNA00001
+.	CDS	5000	5500	.	+	0	cds00001.3	edenprotein.1	mRNA00001
+.	CDS	3301	3902	.	+	0	cds00003.1	edenprotein.2	mRNA00002
+.	CDS	5000	5500	.	+	1	cds00003.2	edenprotein.2	mRNA00002
+.	CDS	3391	3902	.	+	0	cds00004.1	edenprotein.3	mRNA00002
+.	CDS	5000	5500	.	+	1	cds00004.2	edenprotein.3	mRNA00002

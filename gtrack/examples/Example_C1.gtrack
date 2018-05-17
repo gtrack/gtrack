@@ -1,0 +1,17 @@
+##gtrack version: 1.0
+##track type: valued points
+##1-indexed: true
+##end inclusive: true
+###start	value
+
+####seqid=chr1
+201	25.0
+301	26.0
+351	25.0
+476	23.0
+
+####seqid=chr2
+151	10.0
+251	11.0
+376	13.0
+501	14.0

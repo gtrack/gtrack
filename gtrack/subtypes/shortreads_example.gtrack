@@ -1,0 +1,34 @@
+#
+# GTrack subtype for short reads (example from the GTrack specification)
+#
+# See [1] for more details on GTrack and the concepts of track types. The GTrack
+# specification and GTrack subtypes and example files are found at [2].
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/shortreads_example.gtrack
+#
+#
+# [1] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [2] www.gtrack.no
+#
+#
+##gtrack version: 1.0
+##gtrack subtype: Short reads example
+##subtype version: 0.9
+##subtype adherence: redefinable
+##track type: segments
+###seqid	start	end	strand	read	quality
+
+#
+# Unmapped reads may be stored in comment lines at the end of the file, as
+# exemplified below.
+#
+# Unmapped reads:
+#
+# AGATAGATAGGATCCCAGCTGACT
+# AGTCCTCTAGCTCTGACTATC

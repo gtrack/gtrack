@@ -1,0 +1,38 @@
+#
+# GTrack subtype for ENCODE narrowPeak
+#
+# Works directly with tabular files formatted according to the ENCODE narrowPeak
+# format [1]. See [2] for more details on GTrack and the concepts of track
+# types. The GTrack specification and GTrack subtypes and example files are
+# found at [3].
+#
+# To use:
+#
+# A. Add the following line to the beginning of your GTrack file (excluding the
+# preceding '# ' characters):
+#
+# ##subtype url: http://gtrack.no/narrowpeak.gtrack
+#
+#   or
+#
+# B. Make sure that the name of your narrowPeak file ends with '.narrowpeak' (or
+# a capitalized version). In this case, you do not need to make any changes to
+# the contents of the file.
+#
+#
+# [1] http://genome.ucsc.edu/FAQ/FAQformat.html#format12
+#
+# [2] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [3] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: narrowPeak
+##subtype version: 1.0
+##subtype adherence: strict
+##track type: valued segments
+##value column: signalValue
+##uninterrupted data lines: true
+###seqid	start	end	name	score	strand	signalValue	pValue	qValue	peak

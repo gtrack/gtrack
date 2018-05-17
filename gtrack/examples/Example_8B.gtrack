@@ -1,0 +1,15 @@
+#
+# GTrack example file 8B
+#
+# GTrack file making use of the Short reads example subtype.
+#
+##Track type: valued segments
+##Subtype URL: http://gtrack.no/shortreads_example.gtrack
+###seqid	start	end	strand	read	value	new
+chr1	101	111	+	AGTAGATAGC	0.8	0
+chr1	203	244	-	0:C;15:G	0.7	1
+#
+# Unmapped reads:
+#
+# ATGAATATTAAAAATCTCCT
+# AGCGACCATACGTACATTACGAC

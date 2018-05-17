@@ -1,0 +1,89 @@
+#
+# HyperBrowser GTrack subtype 
+#
+# Contains a set of header variables for use with the Genomic HyperBrowser
+# [1,2], specifying metacontent of a GTrack file. The metacontent is shown in
+# the information box for the track.
+#
+# The Genomic HyperBrowser will accept metacontent from a GTrack file if the
+# header variable "GTrack subtype" is specified as "HyperBrowser". This may be
+# done explicitly, or via a "subtype URL" declaration (as the subtype
+# specification file, i.e. this file, includes the "GTrack subtype" header), or
+# both.
+#
+# See [3] for more details on GTrack and the concepts of track types. The GTrack
+# specification and GTrack subtypes and example files are found at [4].
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/hyperbrowser.gtrack
+#
+#
+# [1] http://hyperbrowser.uio.no
+#
+# [2] Sandve GK, Gundersen S, Rydbeck H, Glad IK, Holden L, Holden M, Liestol K,
+#     Clancy T, Ferkingstad E, Johansen M, Nygaard V, Tostesen E, Frigessi A,
+#     Hovig E: The Genomic HyperBrowser: inferential genomics at the sequence
+#     level. Genome Biol 2010, 11(12):R121.
+#
+# [3] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [4] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: HyperBrowser
+##subtype version: 1.0
+##subtype adherence: free
+#
+# Extra header variables
+#
+##name:
+#
+# Name of the track
+#
+##description:
+#
+# A general description of the contents of the file (HTML accepted)
+#
+##display:
+#
+# Description of display conventions and configuration (for the UCSC Genome
+# Browser, HTML accepted)
+#
+##methods:
+#
+# A description of the methods used to create/preprocess the data (HTML
+# accepted)
+#
+##credits:
+#
+# Acknowledgements to people or institutions (HTML accepted)
+#
+##references:
+#
+# References to articles or URL's where the data can be downloaded (HTML
+# accepted)
+#
+##restrictions:
+#
+# Any restrictions on the use of the track (HTML accepted)
+#
+##version:
+#
+# Version or date information of the file
+#
+##quality:
+#
+# Comments on the quality of the data
+#
+##contact:
+#
+# Email address or other contact information
+#
+##celltype:
+#
+# The cell type associated to the track
+#

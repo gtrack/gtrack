@@ -1,0 +1,17 @@
+##gtrack version: 1.0
+##track type: step function
+##1-indexed: true
+##end inclusive: true
+###end	value
+
+####seqid=chr1; start=201; end=600
+300	25.0
+400	26.0
+500	25.0
+600	23.0
+
+####seqid=chr2; start=151; end=550
+250	10.0
+350	11.0
+450	13.0
+550	14.0

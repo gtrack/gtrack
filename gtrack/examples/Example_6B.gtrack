@@ -1,0 +1,12 @@
+#
+# GTrack example file 6B
+#
+##Track type: function
+##Value type: character
+##Fixed-size data lines: true
+##Data line size: 1
+###value
+####seqid=seq001
+AGC
+####seqid=seq002
+GG

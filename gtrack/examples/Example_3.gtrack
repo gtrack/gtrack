@@ -1,0 +1,18 @@
+#
+# GTrack example file 3
+#
+##Track type: linked step function
+##Edge weights: true
+##Undirected edges: true
+###id	end	value	edges
+
+####seqid=chr1; start=1000; end=2250
+1	1250	10	4=0.4
+2	1500	7	.
+3	2000	2	.
+4	2250	6	1=0.4;6=0.3
+
+####seqid=chr1; start=3000; end=4000
+5	3250	7	.
+6	3500	4	4=0.3
+7	4000	6	.

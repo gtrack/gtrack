@@ -1,0 +1,15 @@
+#
+# GTrack example file 5B
+#
+##Track type: valued segments
+##1-indexed: true
+##End inclusive: true
+##Fixed length: 50
+##Fixed gap size: 50
+###value
+####seqid=chr1; start=201
+25.0
+26.0
+####seqid=chr2; start=151
+10.0
+11.0

@@ -1,0 +1,30 @@
+#
+# GTrack subtype for FASTA data
+#
+# Works directly with FASTA [1] data. See [2] for more details on GTrack and
+# the concepts of track types. The GTrack specification and GTrack subtypes and
+# example files are found at [3].
+#
+# To use, add the following line to the beginning of your GTrack file (excluding
+# the preceding '# ' characters):
+#
+# ##subtype url: gtrack.no/fasta.gtrack
+#
+#
+# [1] http://www.ncbi.nlm.nih.gov/BLAST/blastcgihelp.shtml
+#
+# [2] Gundersen S, Kalas M, Abul O, Frigessi A, Hovig E, Sandve GK: Identifying
+#     elemental genomic track types and representing them uniformly.
+#     BMC Bioinformatics 2011, 12:494.
+#
+# [3] www.gtrack.no
+#
+##gtrack version: 1.0
+##gtrack subtype: FASTA
+##subtype version: 1.0
+##subtype adherence: strict
+##track type: function
+##value type: character
+##fixed-size data lines: true
+##data line size: 1
+###value
