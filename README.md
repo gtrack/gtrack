@@ -12,7 +12,7 @@ The BTrack format supports the same variety of informational content as GTrack, 
 The GSuite[4] format is a unique tabular format that binds together the whole chain of multi-track analysis, from search and retrieval of genomic tracks, through intermediate processing, to analysis.
 
 # Python package
-A Python package supporting parsing, conversion and operations is available from https://github.com/elixir-no-nels/gtrackcore. 
+A Python package supporting parsing, conversion and operations is available from https://github.com/gtrack/gtrackcore. 
 
 # References
 1. Gundersen, Sveinung, et al. "Identifying elemental genomic track types and representing them uniformly." BMC Bioinformatics 12.1 (2011): 1. DOI: 10.1186/1471-2105-12-494
