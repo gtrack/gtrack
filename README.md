@@ -2,6 +2,10 @@
 ## - expressive file formats for analysis of genomic track data
 GTrack, BTrack and GSuite are file formats designed to handle genomic track data of heterogeneous types. The file formats are designed to complement each other and work jointly as a complete ecosystem for representation and analysis of most types of data that can be located along a reference genome.
 
+
+# Overview
+!["Overview of the different components of the GTrack ecosystem."](https://raw.githubusercontent.com/gtrack/gtrack/master/img/gtrack_poster_img.png)
+
 # GTrack
 GTrack[1] is a tabular format that was developed as part of the Genomic HyperBrowser[2,3] system to provide a uniform representation of most types of genomic datasets. GTrack is able to replace common formats such as WIG, GFF, BED, FASTA, in addition to represent chromatin capture datasets, such as Hi-C and ChIA-PET.
 
@@ -13,11 +17,6 @@ The GSuite[4] format is a unique tabular format that binds together the whole ch
 
 # Python package
 A Python package supporting parsing, conversion and operations is available from https://github.com/gtrack/gtrackcore. 
-
-# Overview
-
-!["Overview of the different components of the GTrack ecosystem."](https://raw.githubusercontent.com/gtrack/gtrack/master/img/gtrack_poster_img.png)
-
 
 # References
 1. Gundersen, Sveinung, et al. "Identifying elemental genomic track types and representing them uniformly." BMC Bioinformatics 12.1 (2011): 1. DOI: 10.1186/1471-2105-12-494
