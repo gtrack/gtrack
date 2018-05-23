@@ -375,17 +375,17 @@ anywhere.
 
   Examples:
 
-```
-ftp://ftp.server.com/path/to/file.bed
-http://www.server.com:8080/index?filename=track.wig
-rsync://server.com/path/to/file
-```
+  ```
+  ftp://ftp.server.com/path/to/file.bed
+  http://www.server.com:8080/index?filename=track.wig
+  rsync://server.com/path/to/file
+  ```
 
   For local files, the standard "file" URI scheme is also supported, e.g.:
 
-```
-file:///path/to/file/bed
-```
+  ```
+  file:///path/to/file/bed
+  ```
 
   Note that the "file" scheme does not support files residing other places
   than "localhost". The host part of the URI is thus uneeded, hence the
