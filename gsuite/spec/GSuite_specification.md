@@ -365,13 +365,13 @@ anywhere.
 
 #### Reserved column variable names
 
-- URI:
+- `URI`:
 
   A unique identifier following the Universal Resource Identifier format [5].
   GSuite supports the following standard URI schemes for data residing at a
   remote location:
   
-    `ftp`, `http`, `https`, `rsync`
+  `ftp`, `http`, `https`, `rsync`
 
   Examples:
 
@@ -383,9 +383,7 @@ anywhere.
 
   For local files, the standard "file" URI scheme is also supported, e.g.:
 
-  ```
-  file:///path/to/file/bed
-  ```
+  `file:///path/to/file/bed`
 
   Note that the "file" scheme does not support files residing other places
   than "localhost". The host part of the URI is thus uneeded, hence the
@@ -393,14 +391,14 @@ anywhere.
 
   Two more specifically specified URIs schemes are supported by GSuite:
 
-    "galaxy" and "hb"
+  `"galaxy"` and `"hb"`
 
   The "Galaxy" scheme uniquely identifies a Galaxy dataset, but currently only
   works for the local installation of the Galaxy analysis framework that is
   set up with GSuite support, i.e. one cannot (yet) provide an URI to a remote
   Galaxy installation [6]. The syntax is as follows:
 
-    galaxy:/dataset_key[/directory/structure/to/file]
+  `galaxy:/dataset_key[/directory/structure/to/file]`
 
   Multiple files can be stored within one Galaxy history element using the
   directory structure syntax.
@@ -408,12 +406,12 @@ anywhere.
   The "HB" scheme identifies a track stored as the BTrack format within the
   local installation of GSuite HyperBrowser. The syntax is as follows:
 
-    hb:/track/name/hierarchy
+  `hb:/track/name/hierarchy`
 
   Note that for all the URI schemes except the "HB" one, GSuite supports the
   additional specification of file suffix after a semicolon, as in this example:
 
-    ftp://ftp.server.com/path/to/file;bed
+  `ftp://ftp.server.com/path/to/file;bed`
 
   This usable if the file path itself does not contain the suffix, and hence
   does not contain any information on the actual file format of the track.
@@ -441,9 +439,9 @@ anywhere.
   the BTrack format (including those with "HB" as URI) automatically gets
   "preprocessed" as "file_format".
 
-  Allowed values: unknown, primary, preprocessed
+  Allowed values: `unknown`, `primary`, `preprocessed`
 
-  Default value: unknown
+  Default value: `unknown`
 
 - Track_type:
 
@@ -452,21 +450,21 @@ anywhere.
   the "track_type" is automatically collected from the BTrack file(s)
   themselves.
 
-  Allowed values: unknown, points, valued points, segments, valued segments,
-    genome partition, step function, function, linked points, linked valued
-    points, linked segments, linked valued segments, linked genome partition,
-    linked step function, linked function, linked base pairs
+  Allowed values: `unknown`, `points`, `valued points`, `segments`, `valued segments`,
+    `genome partition`, `step function`, `function`, `linked points`, `linked valued`
+    `points`, `linked segments`, `linked valued segments`, `linked genome partition`,
+    `linked step function`, `linked function`, `linked base pairs`
 
-  Default value: unknown
+  Default value: `unknown`
 
 - Genome:
 
   Specifies the reference genome build used as basis of the track, as
   described in the section "Header lines" above.
 
-  Allowed: unknown, any other string specifying a reference genome
+  Allowed: `unknown`, any other string specifying a reference genome
   
-  Default value: unknown
+  Default value: `unknown`
 
 - Custom columns
 
@@ -491,12 +489,10 @@ holds also for the columns "track_type" and "genome".
     `val1, val2, val3 = column values`
     `"  "` = tab character
 - Example:
-
-| uri                                    | title         | p-value |
-|----------------------------------------|---------------|---------|
-| http://www.server.com/path/to/file.bed | My cool track | 0.00013 |
-(with tabs instead of spaces)
-
+  | uri                                    | title         | p-value |
+  |----------------------------------------|---------------|---------|
+  | http://www.server.com/path/to/file.bed | My cool track | 0.00013 |
+  (with tabs instead of spaces)
 - Usage
   Track lines are optional. If no track lines are specified, the GSuite file
   represents an empty collection of tracks.
