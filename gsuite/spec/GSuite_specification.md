@@ -484,52 +484,41 @@ holds also for the columns "track_type" and "genome".
 
 ### 3. Track lines
 
-  - Leading characters: none
-
-  - Syntax:
-
-      val1  val2  val3...
-
-      where
-        val1, val2, val3 = column values
-        "  " = tab character
-
-  - Example:
-
-      ###uri                                   title           p-value
-      http://www.server.com/path/to/file.bed   My cool track   0.00013
-        (with tabs instead of spaces)
-
-  - Usage
-
-      Track lines are optional. If no track lines are specified, the GSuite file
-      represents an empty collection of tracks.
-
-  - Description
-
-    Each track is specified as a tab-separated list of metadata values, as
-    defined by the column specification line. See the section "Column
-    specification line" for a more detailed discussion on the allowed values.
+- Leading characters: none
+- Syntax:
+  `val1  val2  val3...`
+  where
+    `val1, val2, val3 = column values`
+    `"  "` = tab character
+- Example:
+  uri                                      title           p-value
+  http://www.server.com/path/to/file.bed   My cool track   0.00013
+    (with tabs instead of spaces)
+- Usage
+  Track lines are optional. If no track lines are specified, the GSuite file
+  represents an empty collection of tracks.
+- Description
+  Each track is specified as a tab-separated list of metadata values, as
+  defined by the column specification line. See the section "Column
+  specification line" for a more detailed discussion on the allowed values.
 
 ## References
 
-[1] ENCODE Project Consortium. "An integrated encyclopedia of DNA elements in
-    the human genome." Nature 489.7414 (2012): 57-74.
-[2] Kundaje, Anshul, et al. "Integrative analysis of 111 reference human
-    epigenomes." Nature 518.7539 (2015): 317-330.
-[3] Gundersen, Sveinung, et al. "Identifying elemental genomic track types and
-    representing them uniformly." BMC Bioinformatics 12.1 (2011): 1.
-[4] Sandve, Geir K., et al. "The Genomic HyperBrowser: inferential genomics at
-    the sequence level." Genome biology 11.12 (2010): 1-12.
-[5] Uniform Resource Identifier (URI): Generic Syntax
-    (https://tools.ietf.org/html/rfc3986)
-[6] Goecks, Jeremy, Anton Nekrutenko, and James Taylor. "Galaxy: a comprehensive
-    approach for supporting accessible, reproducible, and transparent
-    computational research in the life sciences." Genome Biol 11.8 (2010): R86.
+- [1] ENCODE Project Consortium. "An integrated encyclopedia of DNA elements in
+  the human genome." Nature 489.7414 (2012): 57-74.
+- [2] Kundaje, Anshul, et al. "Integrative analysis of 111 reference human
+  epigenomes." Nature 518.7539 (2015): 317-330.
+- [3] Gundersen, Sveinung, et al. "Identifying elemental genomic track types and
+  representing them uniformly." BMC Bioinformatics 12.1 (2011): 1.
+- [4] Sandve, Geir K., et al. "The Genomic HyperBrowser: inferential genomics at
+  the sequence level." Genome biology 11.12 (2010): 1-12.
+- [5] Uniform Resource Identifier (URI): Generic Syntax
+  (https://tools.ietf.org/html/rfc3986)
+- [6] Goecks, Jeremy, Anton Nekrutenko, and James Taylor. "Galaxy: a comprehensive
+  approach for supporting accessible, reproducible, and transparent
+  computational research in the life sciences." Genome Biol 11.8 (2010): R86.
 
-------------------
-    Change log
-------------------
+## Change log
 
 v0.1 - 2015.07.06:
 
