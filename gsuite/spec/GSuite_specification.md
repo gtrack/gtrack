@@ -486,15 +486,17 @@ holds also for the columns "track_type" and "genome".
 
 - Leading characters: none
 - Syntax:
-  `val1  val2  val3...`
+    `val1  val2  val3...`
   where
     `val1, val2, val3 = column values`
     `"  "` = tab character
 - Example:
-  | uri                                    | title         | p-value |
-  |----------------------------------------|---------------|---------|
-  | http://www.server.com/path/to/file.bed | My cool track | 0.00013 |
-  (with tabs instead of spaces)
+
+| uri                                    | title         | p-value |
+|----------------------------------------|---------------|---------|
+| http://www.server.com/path/to/file.bed | My cool track | 0.00013 |
+(with tabs instead of spaces)
+
 - Usage
   Track lines are optional. If no track lines are specified, the GSuite file
   represents an empty collection of tracks.
