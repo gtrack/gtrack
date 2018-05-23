@@ -429,7 +429,7 @@ anywhere.
 
   Allowed values: *any*
 
-- File_format:
+- `File_format`:
 
   Specifies whether the track has been preprocessed into the binary format
   BTrack or not, as described in the section "Header lines" above.
@@ -443,7 +443,7 @@ anywhere.
 
   Default value: `unknown`
 
-- Track_type:
+- `Track_type`:
 
   Specifies the track type of the track, as described in the section "Header
   lines" above. If the track is preprocessed into a BTrack file, the value of
@@ -457,7 +457,7 @@ anywhere.
 
   Default value: `unknown`
 
-- Genome:
+- `Genome`:
 
   Specifies the reference genome build used as basis of the track, as
   described in the section "Header lines" above.
